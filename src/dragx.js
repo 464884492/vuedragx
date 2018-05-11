@@ -1,11 +1,10 @@
 import Vue from 'vue'
-
 Vue.directive('dragx', (el, binding, vnode) => {
     //  默认参数
     let defaultOpts = {
-        moveDirection: 'n, e, s, w, ne, se, sw, nw, all',
-        moveContainerId: '', //
-        moveBarClass: '', // 类选择器
+        dragDirection: 'n, e, s, w, ne, se, sw, nw, all',
+        dragContainerId: '', //
+        dragBarClass: '', // 类选择器
         resizeEdge: 10,
         dirctDom: true
     };
@@ -25,20 +24,21 @@ Vue.directive('dragx', (el, binding, vnode) => {
             right: rect.right + win.pageXOffset,
             bottom: rect.bottom + win.pageYOffset
         }
-        if (e.pageY > offset.top && e.pageY < offset.top + 5) {
+        if (e.pageY > offset.top && e.pageY < offset.top + cfg.resizeEdge) {
             dir += 'n';
-        } else if (e.pageY < offset.bottom && e.pageY > offset.bottom - cfg.edge) {
+        } else if (e.pageY < offset.bottom && e.pageY > offset.bottom - cfg.resizeEdge) {
             dir += 's';
         }
-        if (e.pageX > offset.left && e.pageX < offset.left + cfg.edge) {
+        if (e.pageX > offset.left && e.pageX < offset.left + cfg.resizeEdge) {
             dir += 'w';
-        } else if (e.pageX < offset.right && e.pageX > offset.right - cfg.edge) {
+        } else if (e.pageX < offset.right && e.pageX > offset.right - cfg.resizeEdge) {
             dir += 'e';
         }
         if (binding.value) {
-            let handles = cfg.moveDirection.split(',');
-            for (let i = 0; i < moveDirection.length; i++) {
-                let handle = moveDirection[i].replace(/(^\s*)|(\s*$)/g, '');
+
+            let directions = cfg.dragDirection.split(',');
+            for (let i = 0; i < directions.length; i++) {
+                let handle = directions[i].replace(/(^\s*)|(\s*$)/g, '');
                 if (handle === 'all' || handle === dir) {
                     return dir;
                 }
@@ -48,12 +48,15 @@ Vue.directive('dragx', (el, binding, vnode) => {
     }
 
     el.onmousemove = function (e) {
-        let dir = getDirection(e);
-        if (dir === '') {
-            el.style.cursor = '';
-        } else {
-            el.style.cursor = dir + '-resize';
+        if (cfg.dragBarClass.length > 0 && e.target.classList.contains(cfg.dragBarClass)) {
+            el.style.cursor = 'move';
+            return;
         }
+        let dir = getDirection(e);
+        if (dir !== '') {
+            el.style.cursor = dir + '-resize'; return;
+        }
+        el.style.cursor = '';
     }
 
     el.onmouseleave = function (e) {
@@ -61,9 +64,9 @@ Vue.directive('dragx', (el, binding, vnode) => {
     }
 
     el.onmousedown = function (e) {
-        
+
         isMove = false;
-        if (cfg.moveBarClass.length > 0 && e.target.classList.contains(cfg.moveBarClass)) {
+        if (cfg.dragBarClass.length > 0 && e.target.classList.contains(cfg.dragBarClass)) {
             isMove = true;
             document.body.style.cursor = 'move';
         }
@@ -122,6 +125,7 @@ Vue.directive('dragx', (el, binding, vnode) => {
                 data.startY = data.startY + deltY;
             }
             if (cfg.dirctDom) {
+                console.log(data);
                 el.style.width = data.width + "px";
                 el.style.height = data.height + "px";
                 el.style.left = data.left + 'px';
