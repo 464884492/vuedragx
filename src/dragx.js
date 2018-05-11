@@ -1,16 +1,52 @@
 import Vue from 'vue'
 
 Vue.directive('dragx', (el, binding, vnode) => {
+    //  默认参数
     let defaultOpts = {
-        handles: 'n, e, s, w, ne, se, sw, nw, all',
-        moveContainer: '',
-        moveTarget: '',
-        dirctDom: true,
-        edge: 10
+        moveDirection: 'n, e, s, w, ne, se, sw, nw, all',
+        moveContainerId: '', //
+        moveBarClass: '', // 类选择器
+        resizeEdge: 10,
+        dirctDom: true
     };
     let isMove = false;
     binding.value = binding.value || {};
     let cfg = Object.assign({}, defaultOpts, binding.value);
+
+    // 获取目标元素 resize方向
+    function getDirection(e) {
+        let el = e.currentTarget;
+        let dir = '';
+        let rect = el.getBoundingClientRect();
+        let win = el.ownerDocument.defaultView;
+        let offset = {
+            top: rect.top + win.pageYOffset,
+            left: rect.left + win.pageXOffset,
+            right: rect.right + win.pageXOffset,
+            bottom: rect.bottom + win.pageYOffset
+        }
+        if (e.pageY > offset.top && e.pageY < offset.top + 5) {
+            dir += 'n';
+        } else if (e.pageY < offset.bottom && e.pageY > offset.bottom - cfg.edge) {
+            dir += 's';
+        }
+        if (e.pageX > offset.left && e.pageX < offset.left + cfg.edge) {
+            dir += 'w';
+        } else if (e.pageX < offset.right && e.pageX > offset.right - cfg.edge) {
+            dir += 'e';
+        }
+        if (binding.value) {
+            let handles = cfg.moveDirection.split(',');
+            for (let i = 0; i < moveDirection.length; i++) {
+                let handle = moveDirection[i].replace(/(^\s*)|(\s*$)/g, '');
+                if (handle === 'all' || handle === dir) {
+                    return dir;
+                }
+            }
+        }
+        return '';
+    }
+
     el.onmousemove = function (e) {
         let dir = getDirection(e);
         if (dir === '') {
@@ -25,9 +61,9 @@ Vue.directive('dragx', (el, binding, vnode) => {
     }
 
     el.onmousedown = function (e) {
-        //   判断当前是否点击移动按钮
+        
         isMove = false;
-        if (cfg.moveTarget.length > 0 && e.target.classList.contains(cfg.moveTarget)) {
+        if (cfg.moveBarClass.length > 0 && e.target.classList.contains(cfg.moveBarClass)) {
             isMove = true;
             document.body.style.cursor = 'move';
         }
@@ -93,6 +129,7 @@ Vue.directive('dragx', (el, binding, vnode) => {
             }
             el.dispatchEvent(new CustomEvent('boundingUpdate', { detail: data }));
         }
+
         document.onmouseup = function (e) {
             document.body.style.cursor = '';
             document.onmousemove = null;
@@ -101,37 +138,5 @@ Vue.directive('dragx', (el, binding, vnode) => {
             document.body.removeChild(mask);
         }
         document.body.style.cursor = dir + '-resize';
-    }
-    function getDirection(e) {
-        let el = e.currentTarget;
-        let dir = '';
-        let rect = el.getBoundingClientRect();
-        let win = el.ownerDocument.defaultView;
-        let offset = {
-            top: rect.top + win.pageYOffset,
-            left: rect.left + win.pageXOffset,
-            right: rect.right + win.pageXOffset,
-            bottom: rect.bottom + win.pageYOffset
-        }
-        if (e.pageY > offset.top && e.pageY < offset.top + 5) {
-            dir += 'n';
-        } else if (e.pageY < offset.bottom && e.pageY > offset.bottom - cfg.edge) {
-            dir += 's';
-        }
-        if (e.pageX > offset.left && e.pageX < offset.left + cfg.edge) {
-            dir += 'w';
-        } else if (e.pageX < offset.right && e.pageX > offset.right - cfg.edge) {
-            dir += 'e';
-        }
-        if (binding.value) {
-            let handles = cfg.handles.split(',');
-            for (let i = 0; i < handles.length; i++) {
-                let handle = handles[i].replace(/(^\s*)|(\s*$)/g, '');
-                if (handle === 'all' || handle === dir) {
-                    return dir;
-                }
-            }
-        }
-        return '';
     }
 });
