@@ -46,6 +46,17 @@ Vue.directive('dragx', (el, binding, vnode) => {
         }
         return '';
     }
+    //  设置约束范围
+    function setConstraint(data) {
+        if (cfg.dragContainerId) {
+            let constraintDom = document.querySelector("#" + cfg.dragContainerId);
+            let constraintRect = constraintDom.getBoundingClientRect();
+            if (data.left <= 0) data.left = 0;
+            if (data.top <= 0) data.top = 0;
+            if (data.top + data.height+data.borderTop+data.borderBottom >= constraintRect.height) data.top = constraintRect.height - data.height-data.borderTop-data.borderBottom;
+            if (data.left + data.width+data.borderLeft+data.borderRight > constraintRect.width) data.left = constraintRect.width - data.width-data.borderLeft-data.borderRight;
+        }
+    }
 
     el.onmousemove = function (e) {
         if (cfg.dragBarClass.length > 0 && e.target.classList.contains(cfg.dragBarClass)) {
@@ -64,7 +75,6 @@ Vue.directive('dragx', (el, binding, vnode) => {
     }
 
     el.onmousedown = function (e) {
-
         isMove = false;
         if (cfg.dragBarClass.length > 0 && e.target.classList.contains(cfg.dragBarClass)) {
             isMove = true;
@@ -80,6 +90,10 @@ Vue.directive('dragx', (el, binding, vnode) => {
             height: getStyleNumValue("height"),
             left: getStyleNumValue("left"),
             top: getStyleNumValue("top"),
+            borderLeft:getStyleNumValue("border-left-width"),
+            borderTop:getStyleNumValue("border-top-width"),
+            borderRight:getStyleNumValue("border-right-width"),
+            borderBottom:getStyleNumValue("border-bottom-width"),
             deltX: e.pageX - rect.left,
             deltY: e.pageY - rect.top,
             startX: rect.left,
@@ -92,21 +106,21 @@ Vue.directive('dragx', (el, binding, vnode) => {
         mask.style.cssText = "position:absolute;top:0px;bottom:0px;left:0px;right:0px;";
         document.body.appendChild(mask);
         document.onmousemove = function (edom) {
-            //  获取当前鼠标位置 2 border
+            //  获取当前鼠标位置
             if (dir.indexOf("e") > -1) {
-                data.width = edom.pageX - data.startX + 2;
+                data.width = edom.pageX - data.startX + data.borderLeft+data.borderRight;
             }
             if (dir.indexOf("s") > -1) {
-                data.height = edom.pageY - data.startY + 2;
+                data.height = edom.pageY - data.startY + data.borderBottom+data.borderTop;
             }
             if (dir.indexOf("n") > -1) {
-                let deltheight = data.startY + 2 - edom.pageY;
+                let deltheight = data.startY + data.borderBottom+data.borderTop- edom.pageY;
                 data.height += deltheight;
                 data.top -= deltheight;
                 data.startY -= deltheight;
             }
             if (dir.indexOf("w") > -1) {
-                let deltwidth = data.startX + 2 - edom.pageX;
+                let deltwidth = data.startX + data.borderLeft+data.borderRight- edom.pageX;
                 data.width += deltwidth;
                 data.left -= deltwidth;
                 data.startX -= deltwidth;
@@ -123,9 +137,9 @@ Vue.directive('dragx', (el, binding, vnode) => {
                 data.top = newTop;
                 data.startX = data.startX + deltX;
                 data.startY = data.startY + deltY;
+                setConstraint(data);
             }
             if (cfg.dirctDom) {
-                console.log(data);
                 el.style.width = data.width + "px";
                 el.style.height = data.height + "px";
                 el.style.left = data.left + 'px';
