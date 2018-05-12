@@ -35,7 +35,6 @@ Vue.directive('dragx', (el, binding, vnode) => {
             dir += 'e';
         }
         if (binding.value) {
-
             let directions = cfg.dragDirection.split(',');
             for (let i = 0; i < directions.length; i++) {
                 let handle = directions[i].replace(/(^\s*)|(\s*$)/g, '');
@@ -145,7 +144,7 @@ Vue.directive('dragx', (el, binding, vnode) => {
                 el.style.left = data.left + 'px';
                 el.style.top = data.top + 'px';
             }
-            el.dispatchEvent(new CustomEvent('boundingUpdate', { detail: data }));
+            el.dispatchEvent(new CustomEvent('bindUpdate', { detail: data }));
         }
 
         document.onmouseup = function (e) {
