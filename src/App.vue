@@ -83,6 +83,4 @@ bindUpdate(event){
   clear: both;
   margin-top:5px;
 }
-#box2 {
-}
 </style>
