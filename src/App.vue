@@ -3,7 +3,7 @@
   <center>
   <h2>vuedragx</h2>
   </center>
-  <h5>一个能拖动、能调整大小、能更新bind值的vue指令</h5>
+  <h5>一个能拖动、能调整大小、能更新bind值的vue指令-vuedragx</h5>
   <div id="app">
      <div id="box1"  v-dragx="dragBox1"><span>听说你想拖我</span><br/><br/><div class="drag1"><b>来吧</b></div></div>
      <div id="box2" v-dragx="dragBox2" @bindUpdate="bindUpdate" :style="{left:dragBox2.left+'px',top:dragBox2.top+'px',width:dragBox2.width+'px',height:dragBox2.height+'px'}"><span>通过绑定值实现拖到</span><br/><div class="drag1"><b>还是这里拖</b></div>

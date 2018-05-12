@@ -6,7 +6,9 @@ Vue.directive('dragx', (el, binding, vnode) => {
         dragContainerId: '', //
         dragBarClass: '', // 类选择器
         resizeEdge: 10,
-        dirctDom: true
+        dirctDom: true,
+        canDrag:true,
+        canResize:true,
     };
     let isMove = false;
     binding.value = binding.value || {};
@@ -58,7 +60,7 @@ Vue.directive('dragx', (el, binding, vnode) => {
     }
 
     el.onmousemove = function (e) {
-        if (cfg.dragBarClass.length > 0 && e.target.classList.contains(cfg.dragBarClass)) {
+        if (cfg.dragBarClass.length > 0 && e.target.classList.contains(cfg.dragBarClass)&&cfg.canDrag) {
             el.style.cursor = 'move';
             return;
         }
@@ -125,7 +127,7 @@ Vue.directive('dragx', (el, binding, vnode) => {
                 data.startX -= deltwidth;
             }
             // 处理组件 移动
-            if (isMove) {
+            if (isMove&&cfg.canDrag) {
                 let targetPageX = edom.pageX;
                 let targetPageY = edom.pageY;
                 let deltX = targetPageX - data.startX - data.deltX;
@@ -139,10 +141,14 @@ Vue.directive('dragx', (el, binding, vnode) => {
                 setConstraint(data);
             }
             if (cfg.dirctDom) {
+                if(cfg.canResize){
                 el.style.width = data.width + "px";
                 el.style.height = data.height + "px";
+                }
+                if(cfg.canDrag){
                 el.style.left = data.left + 'px';
                 el.style.top = data.top + 'px';
+               }
             }
             el.dispatchEvent(new CustomEvent('bindUpdate', { detail: data }));
         }
