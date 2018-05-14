@@ -2,7 +2,7 @@
 
 > 一个实现拖动和调整大小能更新bind值的vue指令
 
-[!demo](https://github.com/464884492/vuedragx/blob/master/src/assets/demo.png)
+[!demo](https://github.com/464884492/vuedragx/blob/master/src/assets/demo.png?raw=true)
 
 ## Build Setup
 
