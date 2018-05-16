@@ -17,3 +17,7 @@ npm run build --report
 ```
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+
+## ^^
+![1](https://github.com/464884492/vuedragx/blob/master/syn1.png?raw=true)
+![2](https://github.com/464884492/vuedragx/blob/master/syn2.png?raw=true)
